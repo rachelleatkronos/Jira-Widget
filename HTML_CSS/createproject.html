@@ -1,95 +1,42 @@
 ﻿<!DOCTYPE html>
 <html>
     <head>
-        <meta charset="utf-8">
-        <meta name="jira" content="width=device-width, initial-scale=1.0">
-        <meta content="text/html"; charset="utf-8" http-equiv="Content-Type" />
-        <title>Create Project</title>
-        <link rel="stylesheet" href="css/normalize.css">
-        <!-- <link href='http://fonts.googleapis.com/css?family=Nunito:400,300' rel='stylesheet' type='text/css'> -->
-        <link rel="stylesheet" href="css/createissue.css">
+      <meta charset="utf-8">
+      <meta name="jira" content="width=device-width, initial-scale=1.0">
+      <meta content="text/html"; charset="utf-8" http-equiv="Content-Type" />
+      <title>Create Project</title>
+      <!-- <link rel="stylesheet" href="css/normalize.css"> -->
+      <!-- <link href='http://fonts.googleapis.com/css?family=Nunito:400,300' rel='stylesheet' type='text/css'> -->
+      <link rel="stylesheet" href="css/createissue.css">
     </head>
     <body>
-
-	  <!-- <form action="" method="get"> -->
-      <form action="index.html" method="post">
+      
+	  <form action="" method="get"> <!-- HTTP CALL INSERT HERE -->
       	
-      	<!-- TITLE HEADER -->
-        <h1>Create Issue</h1>
-        
-        <fieldset>                   
-          <!-- DROP DOWN MENU FOR PROJECT NAMES DYNAMICALLY POPULATE0-->
-          <label for="projname">Project:</label>
-            <select id="projname" name="projectname_dropdown">
-		      <option value=""><!-- PROJECTS DYNAMICALLY PLACED HERE --></option>
-		    </select>
-			          
-          <label for="issuetype">Issue Type:</label>
-          <select id="issuetype" name="projecttype_dropdown">
-		    <option value=""><!-- DYNAMICALLY PLACED HERE --></option>
-		  </select>
-		</fieldset>	
+      <!-- TITLE HEADER -->
+      <h1>Create Project</h1>
+            
+        <!-- DROP DOWN MENU FOR PROJECT NAMES DYNAMICALLY POPULATE0-->
+        <label for="projname">Project:</label>
+          <select id="projname" name="projectname_dropdown">
+		    <option value=""><!-- PROJECTS DYNAMICALLY PLACED HERE --></option>
+		  </select>			
 		  
-		<!-- GAP WITH SECOND SET OF FIELDS -->  
-		<fieldset>  
-          <label for="summary">Summary:</label>
-          <input type="text" id="summary" name="issue_summary">
-          <label for="integrationtype">Integration Type:</label>
-          <select name="integration_type" title="Undefined">
-            <option value="STND">Standard</option>
-            <option value="NON-STND">Non-Standard</option>
-            <option value="SUPPRT">Support</option>
-            <option value="OTHER">Other</option>
-          </select>
+		
+          <label for="icassigned">IC Assigned:</label>
+          <input type="text" id="icassigned" name="ic_assigned">
+                    
+          <label for="acassigned">AC Assigned:</label>
+          <input type="text" id ="acassigned" name="ac_assigned">
+           
+          <label for="scassigned">SC Assignned:</label>
+          <input type="text" id="scassigned" name="sc_assigned">
           
-          <label for="interfacetype">Interface Type:</label>
-          <select id ="interfacetype "name="interface_type" title="Undefined">
-            <option value="NONE">None</option>
-            <option value="UNDEF">Undefined</option>
-            <option value="PYRLEXP">Payroll Export</option>
-            <option value="EMPIMP">Employee Import</option>
-            <option value="ACRLBALIMP">Accrual Balance Import</option>
-            <option value="ACRLBALEXP">Accrual Balance Export</option>
-            <option value="PNCHIMP">Punch Import</option>
-            <option value="PNCHEXP">Punch Export</option>
-            <option value="PCDEIMP">Paycode Import</option>
-            <option value="PCDEEXP">Paycdoe Export</option>
-            <option value="SCHDIMP">Schedule Import</option>
-            <option value="SCHDEXP">Schedule Export</option>
-            <option value="OTHER">Other</option>
-          </select>
-
-          <label for="components">Component/s:</label>
-          <select id ="components" name="issue_components">
-            <option value="STNDRDINT">Standard Integration</option>
-            <option value="SUPPRTINT">Support Integration</option>
-          </select>
-          
-          <label for="description">Description:</label>
-          <textarea id="description" name="issue_description"></textarea>
-          
-          <!-- PRIORITY BY NUMBERS, CHANGE IF NECESSARY OR CHANGE RANGE (1->4/0->3)-->
-          <label for="priority">Priority:</label>
-          <select id="priority" name="issue_priority">
-            <option value="-2">Lowest</option>
-            <option value="-1">Low</option>
-            <option value="+1">High</option>
-            <option value="+2">Highest</option>
-          </select>
-          
-          <!-- NOT SURE HOW THIS FIELD WORKS/IS USED-->        
-          <label for="issuelabels">Issues:</label>
-          <select id="issuelabels" name="issue_labels">
-            <option><!-- DYNAMICALLY PLACED HERE --></option>
-          </select>
-          
-          <!-- EPIC LINK (...?) -->
-          <label for="epiclink">Epic Link:</label>
-          <select id="epiclink" name="issue_epic_link">
-            <option><!-- DYNAMICALLY PLACED HERE --></option>
-          </select> 
-        </fieldset>
-        <button type="submit">Create Project</button>
+          <label for="openairid">OpenAir ID:</label>
+          <select id="openairid" name="openair_id">
+            <option value=""><!-- PLACE IDS DYNAMICALLY HERE -->
+          </select>         
+            <button type="submit">Create Project</button>
       </form>
     </body>
 </html>
