@@ -1,0 +1,148 @@
+
+	  <script type="text/javascript">
+	    var sys = require('sys')
+		var exec = require('child_process').exec;
+		var child;
+		
+		function CLIObject (call) {
+			this.call = call;
+			this.pass = "";
+			this.createFail = "";
+			this.createExistingFail = "";
+			this.deleteFail = "";
+			this.deleteNonExistingFail = "";
+			this.timeout = "Client error: Invalid request: java.net.ConnectException: Connection timed out: connect";
+			
+			this.setPass = function(passStr) {
+				this.pass = passStr;
+			}
+			
+			this.setCreateFail = function(failStr) {
+				this.createFail = failStr;
+			}
+			
+			this.setCreateExistingFail = function(failStr) {
+				this.createExistingFail = failStr;
+			}
+			
+			this.setDeleteFail = function(failStr) {
+				this.deleteFail = failStr;
+			}
+			
+			this.setDeleteNonExistingFail = function(failStr) {
+				this.deleteNonExistingFail = failStr;
+			}
+			
+			this.run = function() {
+				child = exec(this.call, function (error, stdout, stderr) {
+				console.log('stdout: ' + stdout);
+				if(     
+				{
+					//TODO: Timeout on the number of tries.
+					this.run();
+				}
+				
+				//TODO: add "regex" to find if a message is contained in there instead of a 1:1 comparison.
+				if(  stdout == this.pass || 
+				     stdout == this.createExistingFail || 
+					 stdout == this.deleteNonExistingFail)
+				{
+					//TODO: veirfy??
+					//Do nothing? this step passes? log it to a file?
+					console.log('stderr: ' + stderr);
+				}
+				
+				if (error !== null) {
+					console.log('exec error: ' + error);
+				}
+				});
+			}
+			
+			this.doesPass = function() {
+				
+			}
+		}
+		
+		$('#createProject').submit(function( event ) {
+			var SMBEnt = $("input:radio[name='bustype']:checked").val();
+			var key = $('#openairid').val();
+			var keyComb = SMBEnt + key;
+			var projName = $('#projname').val();
+			var projNameComb = keyComb + " - " + projName;
+			
+			var jar = 'java -jar lib/jira-cli-5.1.0.jar'
+			var loginInfo = '--user=michael.banschbach --password=KRO@56441 --server https://kgintegration.atlassian.net'
+			
+			//TODO: Resubmit until we get another error:
+			//"Client error: Invalid request: java.net.ConnectException: Connection timed out: connect"
+			
+			var createProjectCLI =
+			jar + ' ' + loginInfo + ' ' + 
+			'--action createProject --project "' + keyComb + '" ' +
+			'--name "' + projNameComb + '" ' +
+			'--description "' + projNameComb + '" ' + 
+			'--lead "Michael.Banschbach" ' +
+			'--workflowScheme "CUSMAST: Integration Workflow Scheme" ' +
+			'--issueTypeScheme "CUSMAST: Issue Type Scheme" ' +
+			'--issueTypeScreenScheme "CUSMAST: Integration Issue Type Screen Scheme" ' +
+			'--fieldConfigurationScheme "CUSMAST: Field Configuration Scheme" ' +
+			'--permissionScheme "CUSMAST: Permission Scheme" '+
+			'--notificationScheme "CUSMAST: Notification Scheme"';
+			var createProject = new CLIObject(createProjectCLI);
+			createProject.setCreateExistingFail("Remote error: Remote message: projectName: A project with that name already exists.")
+			
+			//TODO: Completed Deletion Error: 
+			//"Run completed successfully. 0 actions were successful"
+			var delIssueTypeSchemeCLI = 
+			jar + ' ' + loginInfo + ' --action runFromIssueTypeSchemeList --regex "' + keyComb + '\\: .*" ' +
+			'--common "--action deleteIssueTypeScheme --id @schemeId@ --continue"'; 
+			
+			var delScreenSchemeCLI = 
+			jar + ' ' + loginInfo + ' --action runFromScreenSchemeList --regex "' + keyComb + '\\: .*" ' +
+			'--common "--action deleteScreenScheme --id @schemeId@ --continue"';
+			
+			var delScreensCLI = 
+			jar + ' ' + loginInfo + ' --action runFromScreenList --regex "' + keyComb + '\\: .*" ' +
+			'--common "--action deleteScreen --id @screenId@ --continue"';
+ 
+			var delIssueTypeScreenSchemeCLI = 
+			jar + ' ' + loginInfo + ' --action runFromIssueTypeScreenSchemeList --regex "' + keyComb + '\\: .*" ' +
+			'--common "--action deleteIssueTypeScreenScheme --id @schemeId@ --continue"';
+ 
+			var delWorkflowSchemeCLI = 
+			jar + ' ' + loginInfo + ' --action deleteWorkflowScheme --name "' + keyComb + ': Software Simplified Workflow Scheme"';
+ 
+			var delWorkflowCLI = 
+			jar + ' ' + loginInfo + ' --action deleteWorkflow ' +
+			'--name "Software Simplified Workflow for Project '+ keyComb + '"';
+			
+			//First Obviously
+			console.log(createProjectCLI);
+			
+			//Second
+			console.log(delIssueTypeSchemeCLI);
+			console.log(delScreensCLI);
+			console.log(delScreenSchemeCLI);
+			
+			//Third
+			console.log(delIssueTypeScreenSchemeCLI);
+			console.log(delWorkflowCLI);
+			console.log(delWorkflowSchemeCLI);
+		
+			// executes `cli`
+			child = exec(createProjectCLI, function (error, stdout, stderr) {
+			  console.log('stdout: ' + stdout);
+			  //logic based on weather or not the stdout message is pass or fail on the operation we are doing.
+			  //Timeout, resubmit until we get another error.
+			  //Existing Item error, we know our import worked so stop re-submitting even if we didn't get a pass.
+			  //Non-Existing Item Error, stop trying to delete, even if we never got a confirmation
+			  //Confirmation of task, stop doing anything for that particular task
+			  //We also need
+			  console.log('stderr: ' + stderr);
+			  if (error !== null) {
+				console.log('exec error: ' + error);
+			  }
+			});
+			event.preventDefault();
+		});
+	  </script>

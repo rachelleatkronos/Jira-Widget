@@ -7,36 +7,88 @@
       <title>Create Project</title>
       <!-- <link rel="stylesheet" href="css/normalize.css"> -->
       <!-- <link href='http://fonts.googleapis.com/css?family=Nunito:400,300' rel='stylesheet' type='text/css'> -->
-      <link rel="stylesheet" href="css/createproject.css">
+      <link rel="stylesheet" href="createproject.css">
+	  <script src="bootstrap/js/jquery.js"></script>
     </head>
     <body>
       
-	  <form action="" method="get"> <!-- HTTP CALL INSERT HERE -->
+	  <form id="createProject" method="get"> <!-- HTTP CALL INSERT HERE -->
       	
       <!-- TITLE HEADER -->
       <h1>Create Project</h1>
             
         <!-- DROP DOWN MENU FOR PROJECT NAMES DYNAMICALLY POPULATE0-->
-        <label for="projname">Project:</label>
-          <select id="projname" name="projectname_dropdown">
-		    <option value=""><!-- PROJECTS DYNAMICALLY PLACED HERE --></option>
-		  </select>			
+		<label for="projname">Project:</label>
+        <input type="text" id="projname" name="ic_assigned">	
 		  
+		<label for="openairid">OpenAir ID:</label>
+        <input type="text" id="openairid" name="ic_assigned">	
 		
-          <label for="icassigned">IC Assigned:</label>
-          <input type="text" id="icassigned" name="ic_assigned">
+		<input id="smb" type="radio" name="bustype" value="S"><label for="smb">SMB</label>
+		<input id="ent" type="radio" name="bustype" value="E"><label for="ent">Enterprise</label>
+		
+		<input type="checkbox" id="cloud" value="SaaS">
+		<label for="cloud">SaaS</label>
+		
+		<label for="icassigned">IC Assigned:</label>
+        <input type="text" id="icassigned" name="ic_assigned">
                     
-          <label for="acassigned">AC Assigned:</label>
-          <input type="text" id ="acassigned" name="ac_assigned">
+        <label for="acassigned">AC Assigned:</label>
+        <input type="text" id ="acassigned" name="ac_assigned">
            
-          <label for="scassigned">SC Assignned:</label>
-          <input type="text" id="scassigned" name="sc_assigned">
-          
-          <label for="openairid">OpenAir ID:</label>
-          <select id="openairid" name="openair_id">
-            <option value=""><!-- PLACE IDS DYNAMICALLY HERE -->
-          </select>         
-            <button type="submit">Create Project</button>
+        <label for="scassigned">SC Assignned:</label>
+        <input type="text" id="scassigned" name="sc_assigned">
+                
+        <button type="submit">Create Project</button>
       </form>
+	  
+	  <script type="text/javascript">
+	  var createProject = function(client,key,name,lead)
+	  {
+		var shareProjectArgs = {
+			headers: {
+				// Set the cookie from the session information
+				"Content-Type": "application/json"
+			},
+			data: {
+				// Provide additional data for the JIRA search. You can modify the JQL to search for whatever you want.
+				"key": key,
+				"name":name,
+				"lead":lead
+			}
+		};
+		// Make the request return the search results, passing the header information including the cookie.
+		client.post("https://kgintegration.atlassian.net/rest/project-templates/1.0/createshared/10504", shareProjectArgs, function(projectResults, response) {
+			console.log('status code:', response.statusCode);
+			console.log('search result:', projectResults);
+			console.log('response:', response);
+		});
+	  }
+	  
+	  $('#createProject').submit(function( event ) {
+			event.preventDefault();
+			var SMBEnt = $("input:radio[name='bustype']:checked").val();
+			var key = $('#openairid').val();
+			var keyComb = SMBEnt + key;
+			var projName = $('#projname').val();
+			var projNameComb = keyComb + " - " + projName;
+	  
+			var Client = require('node-rest-client').Client;
+			var options_auth = { user: "graham.hudson", password: "Cosmoone1!" };
+			client = new Client(options_auth);
+			// Provide user credentials, which will be used to log in to JIRA.
+			createProject(client,keyComb, projNameComb, "graham.hudson");
+			
+			
+			/*
+			client.put("https://kgintegration.atlassian.net/rest/greenhopper/1.0/rapidview/71/copy", shareProjectArgs, function(copyResults, response) {
+				console.log('status code:', response.statusCode);
+				console.log('search result:', copyResults);
+				console.log('response:', response);
+			});
+			*/
+		});
+	  </script>
+	  
     </body>
 </html>
