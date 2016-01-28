@@ -1,4 +1,16 @@
-﻿<!DOCTYPE html>
+﻿<!--  TO DO: 
+
+		- jQuery Intellisense
+		- Make pretty
+			-> Make field padding smaller
+			-> Center and prettify radio buttons/SaaS checkbox
+			-> Validation (inline jscript) jQuery has built-in validation
+				-> Customer Name must be reqd
+				-> OpenAir ID (static and parsed)
+				-> SMB or ENTERPRISE reqd (no default value)
+				-> Assigned PM and IC /OR/ AC -->
+
+<!DOCTYPE html>
 <html>
     <head>
       <meta charset="utf-8">
@@ -15,32 +27,45 @@
 	  <form id="createProject" method="get"> <!-- HTTP CALL INSERT HERE -->
       	
       <!-- TITLE HEADER -->
-      <h1>Create Project</h1>
+      <h1>Create Project For JIRA</h1>
             
         <!-- DROP DOWN MENU FOR PROJECT NAMES DYNAMICALLY POPULATE0-->
-		<label for="projname">Project:</label>
+		<label for="projname">Customer Name:</label>
         <input type="text" id="projname" name="ic_assigned">	
 		  
-		<label for="openairid">OpenAir ID:</label>
-        <input type="text" id="openairid" name="ic_assigned">	
+		<label for="openairid">OpenAir Project ID:</label>
+        <input type="text" id="openairid" name="ic_assigned" readonly="true">	
+      	
+      	<!-- DO NOT ADD DEFAULT VALUE -->
+      	<div id="radiocontainer">
+      		<div id="smbd">
+				<input id="smb" type="radio" name="bustype" value="S" class="radio"><label for="smb">SMB</label>
+			</div>
+		  <div id="enterprise">
+		    <input id="ent" type="radio" name="bustype" value="E" class="radio"><label for="ent">Enterprise<br /></label>
+		  </div>
+		</div>
 		
-		<input id="smb" type="radio" name="bustype" value="S"><label for="smb">SMB</label>
-		<input id="ent" type="radio" name="bustype" value="E"><label for="ent">Enterprise</label>
+		<div class="checkbox">
+		  <input type="checkbox" id="cloud" value="SaaS"><label for="cloud">SaaS</label>
+		</div>
 		
-		<input type="checkbox" id="cloud" value="SaaS">
-		<label for="cloud">SaaS</label>
-		
-		<label for="icassigned">IC Assigned:</label>
-        <input type="text" id="icassigned" name="ic_assigned">
-                    
-        <label for="acassigned">AC Assigned:</label>
-        <input type="text" id ="acassigned" name="ac_assigned">
+        <label for="pmassigned">PM Assigned:</label>
+        <input type="text" id ="pmassigned" name="pm_assigned">
            
-        <label for="scassigned">SC Assignned:</label>
-        <input type="text" id="scassigned" name="sc_assigned">
-                
-        <button type="submit">Create Project</button>
+        <label for="acscassigned">AC Or SC Assignned:</label>
+        <input type="text" id="acscassigned" name="acsc_assigned">
+        
+        <label for="icassigned">IC Assigned: <i>(Optional)</i></label>
+        <input type="text" id="icassigned" name="ic_assigned">
+        
+        <button type="submit" id="createbutton">Create Project</button>
       </form>
+      
+      <script type="text/javascript">
+      <!-- Javascript/jQuery tag for validation -->
+      
+      </script>
 	  
 	  <script type="text/javascript">
 	  var createProject = function(client,key,name,lead)
@@ -77,7 +102,7 @@
 			var options_auth = { user: "graham.hudson", password: "Cosmoone1!" };
 			client = new Client(options_auth);
 			// Provide user credentials, which will be used to log in to JIRA.
-			createProject(client,keyComb, projNameComb, "graham.hudson");
+			//createProject(client,keyComb, projNameComb, "graham.hudson");
 			
 			
 			/*
