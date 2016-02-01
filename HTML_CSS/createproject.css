@@ -3,7 +3,6 @@
   -webkit-box-sizing: border-box;
   box-sizing: border-box;
   position: relative;
-  /* float: left; */
   /* margin-right: 5px; */
 }
 
@@ -38,16 +37,16 @@ h1 {
 input[type=text], input[type=password], input[type=date], input[type=datetime], input[type=email], input[type=number], input[type=search], input[type=tel], input[type=time], input[type=url], textarea, select {
   background: rgba(255,255,255,0.1);
   border: none;
-  font-size: 16px;
+  font-size: 20px;
   height: auto;
   margin: 0;
   outline: 0;
-  padding: 15px;
+  padding: 8px;
   width: 100%;
   background-color: #e8eeef;
-  color: #8a97a0;
+  color: black;
   box-shadow: 0 1px 0 rgba(0,0,0,0.03) inset;
-  margin-bottom: 10px;
+  margin-bottom: 25px;
 }
 
 select {
@@ -59,13 +58,13 @@ select {
 button {
   padding: 19px 39px 18px 39px;
   color: #FFF;
-  background-color: #4bc970;
+  background-color: #ff9800;
   font-size: 18px;
   text-align: center;
   font-style: normal;
   border-radius: 5px;
   width: 100%;
-  border: 1px solid #3ac162;
+  border: 1px solid #ff9800;
   border-width: 1px 1px 3px;
   box-shadow: 0 -1px 0 rgba(255,255,255,0.1) inset;
   margin-bottom: 10px;
@@ -78,7 +77,8 @@ fieldset {
 
 label {
   display: block;
-  margin-bottom: 8px;
+  /* margin-bottom: 8px; */
+  /* margin-left: 10px; */
 }
 
 label.light {
@@ -148,28 +148,28 @@ input.radio:empty ~ label:before {
 input.radio:hover:not(:checked) ~ label:before {
 	content:'\2714';
 	text-indent: .9em;
-	color: #C2C2C2;
+	color: black;
 }
 
 input.radio:hover:not(:checked) ~ label {
-	color: #888;
+	color: black;
 }
 
 /* toggle on */
 input.radio:checked ~ label:before {
 	content:'\2714';
 	text-indent: .9em;
-	color: #9CE2AE;
-	background-color: #4DCB6D;
+	color: black;
+	background-color: #ff9800;
 }
 
 input.radio:checked ~ label {
-	color: #777;
+	color: black;
 }
 
 /* radio focus */
 input.radio:focus ~ label:before {
-	box-shadow: 0 0 0 1px #999;
+	box-shadow: 0 0 0 1px black;
 }
 
 div#radiocontainer {
@@ -177,36 +177,37 @@ div#radiocontainer {
     margin-bottom: 50px;
 }
 
-/**
+/*
  * Checkbox
  */
-.checkbox {
+#cloud {
 	width: 40px;
 	height: 40px;
-	background: #ddd;
-	margin: 20px 90px;
+	background: black;
+	/* margin: 20px 90px; */
 	border-radius: 100%;
-	position: relative;
+	/* position: relative; */
 	box-shadow: 0px 1px 3px rgba(0,0,0,0.5);
 }
 
-.checkbox label {
+#cloud {
 	display: block;
 	width: 30px;
 	height: 30px;
 	border-radius: 100px;
-
 	transition: all .5s ease;
 	cursor: pointer;
-	position: absolute;
-	top: 5px;
-	left: 5px;
+	/* position: absolute; */
+	top: 12px;
+	/* left: 5px; */
 	z-index: 1;
-
-	background: #333;
+	background: black;
 	box-shadow:inset 0px 1px 3px rgba(0,0,0,0.5);
 }
 
-.cloud input[type=checkbox]:checked + label {
-	background: #26ca28;
+label[for=cloud] {position: relative;margin-left: 40px;top: -12px;}
+
+#cloud input[type=checkbox]:checked + label[for=cloud] {
+	background: #ff9800;
+	background-color:black;
 }
