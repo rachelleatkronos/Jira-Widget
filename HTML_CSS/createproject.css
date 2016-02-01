@@ -2,6 +2,19 @@
   -moz-box-sizing: border-box;
   -webkit-box-sizing: border-box;
   box-sizing: border-box;
+  position: relative;
+  /* float: left; */
+  /* margin-right: 5px; */
+}
+
+div#enterprise {
+    float: right;
+    padding: 0;
+    margin-right: 0;
+}
+
+div#smbd {
+    float: left;
 }
 
 body {
@@ -34,7 +47,7 @@ input[type=text], input[type=password], input[type=date], input[type=datetime], 
   background-color: #e8eeef;
   color: #8a97a0;
   box-shadow: 0 1px 0 rgba(0,0,0,0.03) inset;
-  margin-bottom: 30px;
+  margin-bottom: 10px;
 }
 
 select {
@@ -92,5 +105,108 @@ label.light {
   form {
     max-width: 480px;
   }
+}
 
+/* hide input */
+input.radio:empty {
+	margin-left: -9999px;
+}
+
+input.radio ~ label {
+  width: 200px;
+  border-radius: 3px;
+  border: 1px solid #D1D3D4
+}
+
+/* style label */
+input.radio:empty ~ label {
+	position: relative;
+	float: left;
+	line-height: 2.5em;
+	text-indent: 3.25em;
+	/* margin-top: 2em; */
+	cursor: pointer;
+	-webkit-user-select: none;
+	-moz-user-select: none;
+	-ms-user-select: none;
+	user-select: none;
+}
+
+input.radio:empty ~ label:before {
+	position: absolute;
+	display: block;
+	top: 0;
+	bottom: 0;
+	left: 0;
+	content: '';
+	width: 2.5em;
+	background: #D1D3D4;
+	border-radius: 3px 0 0 3px;
+}
+
+/* toggle hover */
+input.radio:hover:not(:checked) ~ label:before {
+	content:'\2714';
+	text-indent: .9em;
+	color: #C2C2C2;
+}
+
+input.radio:hover:not(:checked) ~ label {
+	color: #888;
+}
+
+/* toggle on */
+input.radio:checked ~ label:before {
+	content:'\2714';
+	text-indent: .9em;
+	color: #9CE2AE;
+	background-color: #4DCB6D;
+}
+
+input.radio:checked ~ label {
+	color: #777;
+}
+
+/* radio focus */
+input.radio:focus ~ label:before {
+	box-shadow: 0 0 0 1px #999;
+}
+
+div#radiocontainer {
+    width: 100%;
+    margin-bottom: 50px;
+}
+
+/**
+ * Checkbox
+ */
+.checkbox {
+	width: 40px;
+	height: 40px;
+	background: #ddd;
+	margin: 20px 90px;
+	border-radius: 100%;
+	position: relative;
+	box-shadow: 0px 1px 3px rgba(0,0,0,0.5);
+}
+
+.checkbox label {
+	display: block;
+	width: 30px;
+	height: 30px;
+	border-radius: 100px;
+
+	transition: all .5s ease;
+	cursor: pointer;
+	position: absolute;
+	top: 5px;
+	left: 5px;
+	z-index: 1;
+
+	background: #333;
+	box-shadow:inset 0px 1px 3px rgba(0,0,0,0.5);
+}
+
+.cloud input[type=checkbox]:checked + label {
+	background: #26ca28;
 }
