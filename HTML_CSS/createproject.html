@@ -101,10 +101,11 @@
 	  
 			var Client = require('node-rest-client').Client;
 			var options_auth = { user: "graham.hudson", password: "Cosmoone1!" };
-			client = new Client(options_auth);
+			var client = new Client(options_auth);
 			// Provide user credentials, which will be used to log in to JIRA.
 			//createProject(client,keyComb, projNameComb, "graham.hudson");
 			
+            
 			
 			/*
 			client.put("https://kgintegration.atlassian.net/rest/greenhopper/1.0/rapidview/71/copy", shareProjectArgs, function(copyResults, response) {
