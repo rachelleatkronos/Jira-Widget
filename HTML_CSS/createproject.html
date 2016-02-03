@@ -1,5 +1,4 @@
 ﻿<!--  TO DO: 
-
 		- jQuery Intellisense
 		- Make pretty
 			(DONE)-> Make field padding smaller 
@@ -71,49 +70,156 @@
 	  <script type="text/javascript">
 	  var createProject = function(client,key,name,lead)
 	  {
-		var shareProjectArgs = {
-			headers: {
-				// Set the cookie from the session information
-				"Content-Type": "application/json"
-			},
-			data: {
-				// Provide additional data for the JIRA search. You can modify the JQL to search for whatever you want.
-				"key": key,
-				"name":name,
-				"lead":lead
-			}
-		};
-		// Make the request return the search results, passing the header information including the cookie.
-		client.post("https://kgintegration.atlassian.net/rest/project-templates/1.0/createshared/10504", shareProjectArgs, function(projectResults, response) {
-			console.log('status code:', response.statusCode);
-			console.log('search result:', projectResults);
-			console.log('response:', response);
+		var shareProjectArgs = generateData(false, {
+		  "key": key,
+		  "name":name,
+		  "lead":lead
+		});
+		client.post("https://kgintegration.atlassian.net/rest/project-templates/1.0/createshared/10504", shareProjectArgs, function(result, response) {
+		  debugLog(result,response);
+          var projId = result.projectId;
+          var projKey = result.projectKey;  
+          copyBoard(client, "71", projId, projKey);
 		});
 	  }
+      
+      var copyBoard = function(client, boardId, projectId, projectKey)
+      {
+        var createBoard = generateData(false, {});
+        client.put("https://kgintegration.atlassian.net/rest/greenhopper/1.0/rapidview/" + boardId + "/copy", createBoard, function(result, response) {
+		  debugLog(result,response);
+          var newBoardId = result.id; 
+          renameBoard(client,newBoardId,projectKey);   
+		});
+      }
+      
+      var renameBoard = function(client, boardId, projKey)
+      {
+        var renameBoard = generateData(false, {
+          "id":boardId,
+          "name":projKey + " General Board"
+		});
+        client.put("https://kgintegration.atlassian.net/rest/greenhopper/1.0/rapidviewconfig/name", renameBoard, function(result, response) {
+		  debugLog(result,response);
+          createFilter(client, "10513", projKey, true, boardId);
+		});
+      }
 	  
+      var createFilter = function(client, filterId, projKey, favorite, boardId)
+      {
+        var createFilter = generateData(false, {
+          "name":"Board " + projKey + " with Base Info",
+          "jql":"project = " + projKey + " ORDER BY Rank ASC",
+          "favourite":favorite,
+          "id":filterId
+		});
+        client.post("https://kgintegration.atlassian.net/rest/api/2/filter/", createFilter, function(result, response) {
+		  debugLog(result,response);
+          var newFilterId = result.id;
+          assignFilter(client, newFilterId, boardId);
+		});
+      }
+      
+      var assignFilter = function(client, filterId, boardId)
+      {
+        var assignFilter = generateData(false, {
+          "id":boardId,
+          "savedFilterId":filterId
+		});
+        client.put("https://kgintegration.atlassian.net/rest/greenhopper/1.0/rapidviewconfig/filter", assignFilter, function(result, response) {
+		  debugLog(result,response);
+          console.log('FINISHED!')
+		});
+      }
+      
+      var setFilterPermissions = function(client, filterId, filterName, projectId, roldId, groupId)
+      {
+        var filterPermissions = generateData(true, {
+          "filterId":filterId,
+          "filterName":"Board+S11101012+with+Base+Info",
+          "filterDescription":"",
+          "favourite":"true",
+          "groupShare":groupId,     //"ID+Group"
+          "projectShare":projectId, //"10619"
+          "roleShare":roleId,       //""
+          "shareValues":"%5B%7B%22type%22%3A%22global%22%7D%5D",
+          "returnUrl":"..%2Fissues%2F%3Ffilter%3D10638",
+          "Save":"Save"
+        });
+        client.post("https://kgintegration.atlassian.net/secure/EditFilter.jspa", filterPermissions, function(result, response) {
+		  debugLog(result,response);
+          console.log('FINISHED!')
+		});
+      }
+      
+      var generateData = function(urlencoded, data) {
+          var header;
+          var dataVal;
+          
+          if(urlencoded) {
+            header = {
+              "Content-Type": "application/x-www-form-urlencoded",
+              "X-Atlassian-Token":"no-check",
+              "Accept":"*/*"
+            };
+            var urlConcat = '';
+            for (var key in data) {
+              if (data.hasOwnProperty(key)) {
+                urlConcat += '&' + key + '=' + data[key];
+              }
+            }
+            dataVal = urlConcat.substr(1);
+          } else {
+            header = { "Content-Type": "application/json" };
+            dataVal = data;
+          }
+          
+          var returnData = {
+              headers: header,
+              data: dataVal
+          }
+          return returnData;
+      }
+      
+      var debugLog = function(result, response) {
+        console.log('status code:', response.statusCode);
+		console.log('search result:', result);
+		console.log('response:', response);
+      }
+      
+      $('#projname').keyup(function(e) {
+          var proj = $('#projname');
+          proj.val(proj.val().trimLeft());
+          
+          var name = proj.val();
+          
+          if(name.indexOf(' ') == -1) {
+            $('#openairid').val(name);
+          }
+          else {
+            var key = name.substr(0, name.indexOf(' '));
+            $('#openairid').val(key);
+          }
+          
+          if(e.keyCode === 38)
+            return false;
+      });
+      
 	  $('#createProject').submit(function( event ) {
 			event.preventDefault();
 			var SMBEnt = $("input:radio[name='bustype']:checked").val();
-			var key = $('#openairid').val();
-			var keyComb = SMBEnt + key;
 			var projName = $('#projname').val();
-			var projNameComb = keyComb + " - " + projName;
+            var key = projName.substr(0, projName.indexOf(' '));
+            var keyComb = SMBEnt + key;
+            $('#openairid').val(keyComb);
 	  
 			var Client = require('node-rest-client').Client;
 			var options_auth = { user: "graham.hudson", password: "Cosmoone1!" };
 			var client = new Client(options_auth);
 			// Provide user credentials, which will be used to log in to JIRA.
-			//createProject(client,keyComb, projNameComb, "graham.hudson");
-            
 			
-            //test
-			/*
-			client.put("https://kgintegration.atlassian.net/rest/greenhopper/1.0/rapidview/71/copy", shareProjectArgs, function(copyResults, response) {
-				console.log('status code:', response.statusCode);
-				console.log('search result:', copyResults);
-				console.log('response:', response);
-			});
-			*/
+            //createProject(client,keyComb, projName.trim(), "project.owner");
+            testFunc(client);
 		});
 	  </script>
 	  
