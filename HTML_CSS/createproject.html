@@ -23,7 +23,9 @@
       <!-- <link rel="stylesheet" href="css/normalize.css"> -->
       <!-- <link href='http://fonts.googleapis.com/css?family=Nunito:400,300' rel='stylesheet' type='text/css'> -->
       <link rel="stylesheet" href="createproject.css">
+      <link rel="stylesheet" href="bootstrap/css/jquery-ui.css">
 	  <script src="bootstrap/js/jquery.js"></script>
+  	  <script src="bootstrap/js/jquery-ui.js"></script>
     </head>
     <body>
       
@@ -161,6 +163,31 @@
 		});
       }
       
+      var userSearch = function(client, host, request, callback)
+      {
+        var search = generateData(true, {
+          "fieldName":"customfield_10116",
+          "fieldConfigId":"10221",
+          "projectId":"10512",
+          "query":request.term
+        });
+        client.get(host + "/rest/api/1.0/users/picker?" + search.data, {}, function(result, res) {
+		  debugLog(result,res);
+  		  
+  		  if (typeof result !== 'undefined') {
+  		    var array = [];
+  		    for(var i in result.users)
+  		    {
+  		      var item = result.users[i]
+  		      array.push({"label":item.name});
+  		    }
+  		   	callback(array);
+  		  } else {
+  		    console.log("Undefined");
+  		  }
+		});
+      }
+
       var generateData = function(urlencoded, data) {
           var header;
           var dataVal;
@@ -199,7 +226,7 @@
 		console.log('search result:', result);
 		console.log('response:', response);
       }
-      
+            
       $('#projname').keyup(function(e) {
           var proj = $('#projname');
           proj.val(proj.val().trimLeft());
@@ -232,9 +259,36 @@
 			var client = new Client(options_auth);
             var host = "https://kgintegration.atlassian.net";
 			// Provide user credentials, which will be used to log in to JIRA.
-			
-            createProject(client, host, keyComb, projName.trim(), "project.owner");
 		});
+		//createProject(client, host, keyComb, projName.trim(), "project.owner");
+		var Client = require('node-rest-client').Client;
+        //TODO: make this use auth from login.
+		var options_auth = { user: "graham.hudson", password: "Cosmoone1!" };
+		var client = new Client(options_auth);
+        var host = "https://kgintegration.atlassian.net";
+
+        $( "#pmassigned" ).autocomplete({
+	      minLength: 2,
+	      source: function( request, response ) {
+	        console.log("Log reached");
+	        userSearch(client, host, request, response);
+	      },
+	      focus: function( event, ui ) {
+	        $( "#pmassigned" ).val( ui.item.label );
+	        return false;
+	      },
+	      select: function( event, ui ) {
+	        $( "#pmassigned" ).val( ui.item.label ); 
+	        return false;
+	      }
+	    })
+	    .autocomplete( "instance" )._renderItem = function( ul, item ) {
+	      console.log({"logItem":item});
+	      return $( "<li>" )
+	        .append( item.label )
+	        .appendTo( ul );
+	    };
+
 	  </script>
 	  
     </body>
