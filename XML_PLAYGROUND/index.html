@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+</head>
+
+<body>
+    <div class="container">
+        <textarea id="content" rows="6" cols="50">
+        </textarea>
+        
+        <textarea id="results" rows="6" cols="50">
+        </textarea>
+    </div>
+
+
+
+    <button id="run">Run API</button>
+    <!-- /container -->
+
+    <!-- Le javascript
+    ================================================== -->
+    <!-- Placed at the end of the document so the pages load faster -->
+    <script src="bootstrap/js/jquery.js"></script>
+    <script src="bootstrap/js/bootstrap.js"></script>
+    <script type="text/javascript">
+        $("#run").click(function() {
+            var Client = require('node-rest-client').Client;
+            //TODO: make this use auth from login.
+			//var options_auth = { user: "graham.hudson", password: "Cosmoone1!" };
+			var client = new Client();
+            var host = "http://10.130.91.3";
+			// Provide user credentials, which will be used to log in to JIRA.
+			
+            runCustom(client,host);
+            //logon(client,host);
+        });
+        
+        var runCustom = function(client, host)
+        {
+          xmlRequest = {
+            headers: {
+              "Content-Type":"application/xml"
+            },
+            data:'<?xml version=\'1.0\'?><KRONOS_WFC VERSION="1.0"><Request Object="System" Action="Logon" UserName="superuser" Password="Kr0n1tes" LOCALIZED="TRUE"></Request><Request Action="Retrieve" LoadAssocLookupTables="true" LoadLightLinks="true"><WimLink><Name>PersonImport_ToDB.KNX</Name></WimLink></Request></KRONOS_WFC>'
+          };
+		  client.post(host + "/wfc/XmlService", xmlRequest, function(result, response) {
+		    debugLog(result,response);
+            logoff(client, host); 
+		  });
+        }
+        
+        var logon = function(client,host)
+	    {
+		  xmlRequest = {
+            headers: {
+              "Content-Type":"application/xml"
+            },
+            data:'<?xml version=\'1.0\'?><KRONOS_WFC VERSION="1.0"><Request Object="System" Action="Logon" UserName="superuser" Password="Kr0n1tes" LOCALIZED="TRUE"></Request></KRONOS_WFC>'
+          };
+		  client.post(host + "/wfc/XmlService", xmlRequest, function(result, response) {
+		    debugLog(result,response);
+            runCustom(client,host);
+		  });
+	    }
+        
+        var logoff = function(client,host)
+	    {
+		  xmlRequest = {
+            headers: {
+              "Content-Type":"application/xml"
+            },
+            data:'<?xml version=\'1.0\'?><KRONOS_WFC VERSION=\'1.0\'><REQUEST OBJECT=\'SYSTEM\' ACTION=\'LOGOFF\'/></KRONOS_WFC>'
+          };
+		  client.post(host + "/wfc/XmlService", xmlRequest, function(result, response) {
+		    debugLog(result,response); 
+		  });
+	    }
+        
+        var debugLog = function(result, response) {
+          console.log('status code:', response.statusCode);
+		  console.log('search result:', result);
+		  console.log('response:', response);
+        }
+    </script>
+
+</body>
+
+</html>

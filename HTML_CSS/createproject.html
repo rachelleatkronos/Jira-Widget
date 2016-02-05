@@ -68,44 +68,44 @@
       </script>
 	  
 	  <script type="text/javascript">
-	  var createProject = function(client,key,name,lead)
+	  var createProject = function(client,host,key,name,lead)
 	  {
 		var shareProjectArgs = generateData(false, {
 		  "key": key,
 		  "name":name,
 		  "lead":lead
 		});
-		client.post("https://kgintegration.atlassian.net/rest/project-templates/1.0/createshared/10504", shareProjectArgs, function(result, response) {
+		client.post(host + "/rest/project-templates/1.0/createshared/10504", shareProjectArgs, function(result, response) {
 		  debugLog(result,response);
           var projId = result.projectId;
           var projKey = result.projectKey;  
-          copyBoard(client, "71", projId, projKey);
+          copyBoard(client,host, "71", projId, projKey);
 		});
 	  }
       
-      var copyBoard = function(client, boardId, projectId, projectKey)
+      var copyBoard = function(client, host, boardId, projectId, projectKey)
       {
         var createBoard = generateData(false, {});
-        client.put("https://kgintegration.atlassian.net/rest/greenhopper/1.0/rapidview/" + boardId + "/copy", createBoard, function(result, response) {
+        client.put(host + "/rest/greenhopper/1.0/rapidview/" + boardId + "/copy", createBoard, function(result, response) {
 		  debugLog(result,response);
           var newBoardId = result.id; 
-          renameBoard(client,newBoardId,projectKey);   
+          renameBoard(client,host,newBoardId,projectKey,projectId);   
 		});
       }
       
-      var renameBoard = function(client, boardId, projKey)
+      var renameBoard = function(client, host, boardId, projKey, projId)
       {
         var renameBoard = generateData(false, {
           "id":boardId,
           "name":projKey + " General Board"
 		});
-        client.put("https://kgintegration.atlassian.net/rest/greenhopper/1.0/rapidviewconfig/name", renameBoard, function(result, response) {
+        client.put(host + "/rest/greenhopper/1.0/rapidviewconfig/name", renameBoard, function(result, response) {
 		  debugLog(result,response);
-          createFilter(client, "10513", projKey, true, boardId);
+          createFilter(client, host, "10513", projKey, projId, true, boardId);
 		});
       }
 	  
-      var createFilter = function(client, filterId, projKey, favorite, boardId)
+      var createFilter = function(client, host, filterId, projKey, projId, favorite, boardId)
       {
         var createFilter = generateData(false, {
           "name":"Board " + projKey + " with Base Info",
@@ -113,40 +113,49 @@
           "favourite":favorite,
           "id":filterId
 		});
-        client.post("https://kgintegration.atlassian.net/rest/api/2/filter/", createFilter, function(result, response) {
+        client.post(host + "/rest/api/2/filter/", createFilter, function(result, response) {
 		  debugLog(result,response);
           var newFilterId = result.id;
-          assignFilter(client, newFilterId, boardId);
+          var newFilterName = result.name;
+          assignFilter(client, host, newFilterId, boardId);
+          setFilterShares(client, host, newFilterId, newFilterName, "",
+            [
+              {"type":"project","param1":projId}
+            ] 
+      );
 		});
       }
       
-      var assignFilter = function(client, filterId, boardId)
+      var assignFilter = function(client, host, filterId, boardId)
       {
         var assignFilter = generateData(false, {
           "id":boardId,
           "savedFilterId":filterId
 		});
-        client.put("https://kgintegration.atlassian.net/rest/greenhopper/1.0/rapidviewconfig/filter", assignFilter, function(result, response) {
+        client.put(host + "/rest/greenhopper/1.0/rapidviewconfig/filter", assignFilter, function(result, response) {
 		  debugLog(result,response);
           console.log('FINISHED!')
 		});
       }
-      
-      var setFilterPermissions = function(client, filterId, filterName, projectId, roldId, groupId)
+
+      //filterName WILL rename the filter
+      //filterDesc WILL change the description
+      //shareValues is expected to be an array of JSON objects
+      var setFilterShares = function(client, host, filterId, filterName, filterDesc, shareValues)
       {
-        var filterPermissions = generateData(true, {
+        var filterShares = generateData(true, {
           "filterId":filterId,
-          "filterName":"Board+S11101012+with+Base+Info",
-          "filterDescription":"",
+          "filterName":filterName,
+          "filterDescription":filterDesc,
           "favourite":"true",
-          "groupShare":groupId,     //"ID+Group"
-          "projectShare":projectId, //"10619"
-          "roleShare":roleId,       //""
-          "shareValues":"%5B%7B%22type%22%3A%22global%22%7D%5D",
-          "returnUrl":"..%2Fissues%2F%3Ffilter%3D10638",
+          "groupShare":"",
+          "projectShare":"",
+          "roleShare":"",
+          "shareValues":shareValues,
+          "returnUrl":"../issues/?filter=" + filterId,
           "Save":"Save"
         });
-        client.post("https://kgintegration.atlassian.net/secure/EditFilter.jspa", filterPermissions, function(result, response) {
+        client.post(host + "/secure/EditFilter.jspa", filterShares, function(result, response) {
 		  debugLog(result,response);
           console.log('FINISHED!')
 		});
@@ -165,7 +174,11 @@
             var urlConcat = '';
             for (var key in data) {
               if (data.hasOwnProperty(key)) {
-                urlConcat += '&' + key + '=' + data[key];
+                if(typeof data[key] !== 'object') {
+                  urlConcat += '&' + key + '=' + data[key];
+                } else {
+                  urlConcat += '&' + key + '=' + JSON.stringify(data[key]);
+                }
               }
             }
             dataVal = urlConcat.substr(1);
@@ -214,12 +227,13 @@
             $('#openairid').val(keyComb);
 	  
 			var Client = require('node-rest-client').Client;
+            //TODO: make this use auth from login.
 			var options_auth = { user: "graham.hudson", password: "Cosmoone1!" };
 			var client = new Client(options_auth);
+            var host = "https://kgintegration.atlassian.net";
 			// Provide user credentials, which will be used to log in to JIRA.
 			
-            //createProject(client,keyComb, projName.trim(), "project.owner");
-            testFunc(client);
+            createProject(client, host, keyComb, projName.trim(), "project.owner");
 		});
 	  </script>
 	  
